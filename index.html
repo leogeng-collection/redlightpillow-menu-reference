@@ -1,0 +1,489 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>NeoBack Air Manual</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Noto+Sans+SC:wght@400;500;700&display=swap">
+<style>
+/* Layout: a centred book on a desk surface — two-page spread on wide screens, single page on phones; toolbar above */
+:root{
+  --desk:#e9e5df; --desk-ink:#3b3631; --desk-quiet:#7a726a; --chip:#ffffff; --chip-line:#d6d0c8;
+  --paper:#ffffff; --ink:#1d1d1f; --quiet:#5a5a60; --red:#c8302c; --line:#e3e3e6; --tint:#f6f3f2;
+  --sans:"Poppins","Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif;
+  --zh:"Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--desk:#1f1d1b;--desk-ink:#ece7e1;--desk-quiet:#a59d94;--chip:#2c2926;--chip-line:#45403b;color-scheme:dark}}
+:root[data-theme="dark"]{--desk:#1f1d1b;--desk-ink:#ece7e1;--desk-quiet:#a59d94;--chip:#2c2926;--chip-line:#45403b;color-scheme:dark}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:var(--desk);color:var(--desk-ink);font-family:var(--sans);overflow:hidden}
+.app{height:100%;display:flex;flex-direction:column;align-items:center;padding-block:max(12px,env(safe-area-inset-top,0px)) max(12px,env(safe-area-inset-bottom,0px));padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));gap:12px}
+.bar{width:100%;max-width:1100px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.bar h1{font-size:15px;font-weight:600;margin:0;letter-spacing:.01em}
+.bar h1 span{color:var(--desk-quiet);font-weight:400;margin-left:6px}
+.seg{display:inline-flex;background:var(--chip);border:1px solid var(--chip-line);border-radius:999px;padding:3px}
+.seg button{border:0;background:transparent;color:var(--desk-ink);font:500 13px var(--sans);padding:6px 14px;border-radius:999px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--red);color:#fff}
+.stage{flex:1;min-height:0;width:100%;display:flex;align-items:center;justify-content:center;perspective:2600px}
+.book{position:relative;display:flex;filter:drop-shadow(0 18px 30px rgba(0,0,0,.18))}
+.slot{width:var(--pw);height:var(--ph);position:relative}
+.book.spread::after{content:"";position:absolute;left:50%;top:0;bottom:0;width:40px;transform:translateX(-50%);background:linear-gradient(90deg,rgba(0,0,0,0) 0,rgba(0,0,0,.10) 48%,rgba(0,0,0,.16) 50%,rgba(0,0,0,.10) 52%,rgba(0,0,0,0) 100%);pointer-events:none;z-index:5}
+.leaf{position:absolute;top:0;width:var(--pw);height:var(--ph);transform-style:preserve-3d;transition:transform .7s cubic-bezier(.45,.05,.35,1),opacity .7s;z-index:10}
+.leaf .face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden}
+.leaf .back{transform:rotateY(180deg)}
+@media (prefers-reduced-motion:reduce){.leaf{transition:none}}
+.nav{display:flex;align-items:center;gap:12px}
+.nav button{width:40px;height:40px;border-radius:50%;border:1px solid var(--chip-line);background:var(--chip);color:var(--desk-ink);font-size:18px;cursor:pointer;display:grid;place-items:center}
+.nav button:disabled{opacity:.35;cursor:default}
+.nav button:focus-visible,.seg button:focus-visible{outline:2px solid var(--red);outline-offset:2px}
+.count{font:500 13px var(--sans);font-variant-numeric:tabular-nums;color:var(--desk-quiet);min-width:72px;text-align:center}
+.hint{font-size:12px;color:var(--desk-quiet)}
+
+/* ---------- paper pages (deliberately always white, like printed stock) ---------- */
+.page{position:absolute;inset:0;background:var(--paper);color:var(--ink);overflow:hidden;font-size:calc(var(--pw) * .0262);line-height:1.5;padding:2.6em 2.4em 2.4em;display:flex;flex-direction:column}
+.page.zh{font-family:var(--zh);line-height:1.7}
+.page.dense{font-size:calc(var(--pw) * .0236)}
+.page.denser{font-size:calc(var(--pw) * .0222)}
+.page.blank{background:var(--paper)}
+.left .page,.leaf .back .page{box-shadow:inset -14px 0 18px -14px rgba(0,0,0,.18)}
+.right .page,.leaf .front .page{box-shadow:inset 14px 0 18px -14px rgba(0,0,0,.18)}
+.single .page{box-shadow:none}
+.ph{display:flex;align-items:center;gap:.8em;margin-bottom:1.6em}
+.ph .rule{flex:1;height:max(2px,.16em);background:var(--red);border-radius:2px}
+.ph.l{flex-direction:row-reverse}
+.logo{font-family:"Poppins",sans-serif;font-weight:700;letter-spacing:.02em;color:var(--ink);white-space:nowrap}
+.logo b{display:inline-block;color:#fff;background:var(--red);border-radius:.18em;padding:0 .12em;margin-left:.05em;line-height:1.05;font-weight:700}
+.ph .logo{font-size:1.15em}
+.pn{margin-top:auto;padding-top:.8em;text-align:center;font-size:.85em;color:var(--quiet);font-variant-numeric:tabular-nums}
+h2.t{font-family:"Poppins",var(--zh);font-size:1.55em;font-weight:700;text-align:center;margin:0 0 .9em;letter-spacing:.005em}
+h3.s{font-size:1.02em;font-weight:700;margin:.9em 0 .3em}
+p{margin:0 0 .6em}
+.c{text-align:center}
+.small{font-size:.9em}
+.k{font-weight:600}
+.tag{display:inline-block;font-weight:700;margin:.4em 0 .25em}
+ol,ul{margin:0 0 .6em;padding-left:1.3em}
+li{margin-bottom:.35em}
+.gear{margin:0 0 .55em .2em}
+.gear .g{font-weight:600}
+.dot{display:inline-block;width:.75em;height:.75em;border-radius:50%;border:.16em solid currentColor;vertical-align:-.08em;margin-right:.3em}
+.app-s{color:var(--quiet)}
+table.tb{width:100%;border-collapse:collapse;font-size:.92em}
+table.tb td,table.tb th{border:1px solid #2a2a2a;padding:.45em .6em;vertical-align:middle;text-align:left}
+table.tb th{font-weight:600;text-align:center}
+table.spec td:first-child{width:40%;font-weight:500}
+.note{font-size:.88em;color:var(--quiet);margin-top:.5em}
+.fig{display:flex;justify-content:center;margin:.4em 0 .9em}
+.fig svg{width:100%;height:auto}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:1.2em}
+.step{display:grid;grid-template-columns:44% 1fr;gap:1em;align-items:center;margin-bottom:.8em}
+.step .box{border:1.4px solid #2a2a2a;border-radius:.8em;padding:.4em}
+.step .box svg{width:100%;height:auto;display:block}
+.pill{display:inline-grid;place-items:center;width:1.5em;height:1.5em;border-radius:50%;border:1.3px solid currentColor;font-size:.8em;font-weight:600;vertical-align:.05em;margin:0 .15em}
+/* cover */
+.cover{padding:3.2em 2.6em;align-items:center;text-align:center;justify-content:space-between}
+.cover .logo{font-size:2.3em}
+.cover .ttl{font-size:2.05em;font-weight:500;line-height:1.25}
+.cover .lang{font-size:1.25em;font-weight:500;margin-top:.6em;letter-spacing:.04em}
+.cover .mail{font-weight:600;font-size:1.05em}
+.toc{list-style:none;padding:0;margin:0;border-top:1.4px solid #2a2a2a;padding-top:1em}
+.toc li{display:flex;align-items:baseline;gap:.5em;margin-bottom:.55em;cursor:pointer}
+.toc li:hover .tl{color:var(--red)}
+.toc .lead{flex:1;border-bottom:1.4px dashed #555;transform:translateY(-.25em)}
+.toc .pg{font-variant-numeric:tabular-nums}
+.qr{width:6em;height:6em;margin:.6em auto}
+.social{display:flex;justify-content:center;gap:.7em;margin:.4em 0}
+.social span{width:1.5em;height:1.5em;border-radius:.35em;display:grid;place-items:center;color:#fff;font-size:.72em;font-weight:700}
+.handle{font-size:1.8em;font-weight:800;text-align:center;letter-spacing:.01em}
+.redcard{background:linear-gradient(160deg,#d8322c,#b81f1c);color:#fff;border-radius:1em;padding:1em 1em .8em;margin:.6em 0 .9em}
+.redcard .rt{background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.5);border-radius:2em;text-align:center;font-weight:700;padding:.25em .5em;font-size:1.1em}
+.redcard .rs{text-align:center;font-size:.82em;margin:.45em 0 .6em}
+.redcard svg{width:100%;height:auto;display:block}
+.back-cover{align-items:center;justify-content:center;text-align:center;gap:1em;background:#fbfafa}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="bar">
+    <h1>NeoBack Air<span id="sub">User Manual · electronic edition</span></h1>
+    <div class="seg" role="group" aria-label="Language">
+      <button id="b-en" aria-pressed="true">EN</button>
+      <button id="b-zh" aria-pressed="false">中文</button>
+    </div>
+  </div>
+  <div class="stage" id="stage"><div class="book" id="book"></div></div>
+  <div class="nav">
+    <button id="prev" aria-label="Previous page">&#8592;</button>
+    <div class="count" id="count">1 / 18</div>
+    <button id="next" aria-label="Next page">&#8594;</button>
+  </div>
+  <div class="hint" id="hint">Click the page edges, use ← → keys, or swipe to turn pages</div>
+</div>
+<script>
+(function(){
+const LOGO = '<span class="logo">FliKEZ<b>E</b></span>';
+const head = (side) => `<div class="ph ${side}"><span class="rule"></span>${LOGO}</div>`;
+
+/* ---------- illustrations (vector redraws) ---------- */
+const product = (dots=5) => {
+  let c=''; const cols=12, rows=dots;
+  for(let r=0;r<rows;r++) for(let i=0;i<cols;i++){const x=150+i*18.2, y=54+r*(rows===5?13:16); c+=`<circle cx="${x}" cy="${y}" r="4.2" fill="none" stroke="#2a2a2a" stroke-width="1"/><circle cx="${x}" cy="${y}" r="1.4" fill="none" stroke="#2a2a2a" stroke-width=".8"/>`;}
+  return `<svg viewBox="0 0 480 160" aria-hidden="true"><path d="M48 20 Q240 52 432 20 Q468 16 470 50 L470 110 Q468 144 432 140 Q240 108 48 140 Q12 144 10 110 L10 50 Q12 16 48 20Z" fill="#fff" stroke="#2a2a2a" stroke-width="1.6"/><rect x="134" y="40" width="216" height="${rows===5?78:62}" rx="14" fill="none" stroke="#2a2a2a" stroke-width="1.3"/>${c}<rect x="400" y="54" width="26" height="52" rx="12" fill="none" stroke="#2a2a2a" stroke-width="1.3"/>${[64,76,88,100].map(y=>`<circle cx="413" cy="${y}" r="4" fill="none" stroke="#2a2a2a"/>`).join('')}<rect x="38" y="66" width="12" height="30" rx="6" fill="none" stroke="#2a2a2a" stroke-width="1.2"/></svg>`;
+};
+const panel = (L) => `<svg viewBox="0 0 570 210" aria-hidden="true" font-family="inherit" font-size="15">
+ <rect x="70" y="72" width="340" height="66" rx="33" fill="#fff" stroke="#1d1d1f" stroke-width="2"/>
+ <g fill="none" stroke="#1d1d1f" stroke-width="1.8">
+  <circle cx="122" cy="105" r="22"/><circle cx="196" cy="105" r="22"/><circle cx="296" cy="105" r="22"/><circle cx="366" cy="105" r="22"/>
+  <rect x="242" y="90" width="9" height="30" rx="4.5"/>
+  <path d="M188 95 q-3 3 0 6 q3 3 0 6 M196 95 q-3 3 0 6 q3 3 0 6 M204 95 q-3 3 0 6 q3 3 0 6 M184 114 H208"/>
+  <path d="M282 100 l5-5 5 5 5-5 5 5 5-5 M282 112 l5-5 5 5 5-5 5 5 5-5"/>
+  <path d="M359 99 a9 9 0 1 0 14 0 M366 92 V104"/>
+ </g>
+ <rect x="110" y="99" width="24" height="12" rx="6" fill="#1d1d1f"/>
+ <g fill="#3aa757"><circle cx="400" cy="88" r="3"/><circle cx="402" cy="100" r="3"/><circle cx="402" cy="112" r="3"/><circle cx="400" cy="124" r="3"/></g>
+ <g stroke="#1d1d1f" stroke-width="1"><path d="M118 82 L96 46"/><path d="M196 82 L212 28"/><path d="M366 82 L380 46"/><path d="M406 108 L432 108"/><path d="M246 122 L206 170"/><path d="M296 128 L310 170"/></g>
+ <g fill="#1d1d1f">
+  <text x="96" y="40" text-anchor="end" dx="40">${L[0]}</text><text x="214" y="22" text-anchor="middle">${L[1]}</text>
+  <text x="390" y="34" text-anchor="middle">${L[3]}</text><text x="390" y="52" text-anchor="middle">${L[4]||''}</text>
+  <text x="436" y="104">${L[5]}</text><text x="436" y="122">${L[6]||''}</text>
+  <text x="212" y="186" text-anchor="end">${L[7]}</text><text x="300" y="186">${L[2]}</text>
+ </g></svg>`;
+const wave = (L) => `<svg viewBox="0 0 400 300" aria-hidden="true" font-size="11">
+ <text x="120" y="14" text-anchor="middle" font-weight="700" font-size="14" fill="#1d1d1f">FliKEZ<tspan fill="#c8302c">E</tspan></text>
+ <path d="M120 20 V30 M70 30 H170 M70 30 V44 M170 30 V44" stroke="#1d1d1f" fill="none"/>
+ <text x="70" y="56" text-anchor="middle" fill="#1d1d1f">660NM</text><text x="170" y="56" text-anchor="middle" fill="#1d1d1f">850NM</text>
+ <path d="M70 60 V78 M170 60 V78" stroke="#1d1d1f"/>
+ <rect x="20" y="100" width="260" height="26" fill="#efc7a3"/><rect x="20" y="126" width="260" height="48" fill="#f2b3a3"/><rect x="20" y="174" width="260" height="34" fill="#f5dc9f"/>
+ ${[34,58,82,106,130,154,178,202,226,250].map((x,i)=>`<circle cx="${x}" cy="${190+(i%2?4:-3)}" r="8" fill="#f9e7b6" stroke="#d8b766"/>`).join('')}
+ <rect x="20" y="208" width="260" height="22" fill="#e79a86"/><rect x="20" y="230" width="260" height="14" fill="#dcd6d0"/><rect x="20" y="244" width="260" height="10" fill="#3c3c3c"/>
+ <rect x="62" y="80" width="16" height="78" fill="#d42f2b"/><rect x="62" y="150" width="16" height="10" fill="#d42f2b" opacity=".45"/>
+ <rect x="162" y="80" width="16" height="150" fill="#3a2f2c" opacity=".92"/><rect x="162" y="226" width="16" height="12" fill="#3a2f2c" opacity=".4"/>
+ <g stroke="#1d1d1f" fill="none"><path d="M284 100 h6 v26 h-6 M284 126 h6 v48 h-6 M284 174 h6 v34 h-6 M284 208 h6 v22 h-6 M284 230 h6 v14 h-6 M284 244 h6 v10 h-6"/></g>
+ <g fill="#1d1d1f"><text x="296" y="116">${L[0]}</text><text x="296" y="153">${L[1]}</text><text x="296" y="190">${L[2]}</text><text x="296" y="222">${L[3]}</text><text x="296" y="240">${L[4]}</text><text x="296" y="254">${L[5]}</text></g></svg>`;
+const pbm = (L) => `<svg viewBox="0 0 400 200" aria-hidden="true" font-size="11">
+ <rect x="40" y="0" width="140" height="26" rx="6" fill="rgba(255,255,255,.18)" stroke="rgba(255,255,255,.55)"/><text x="110" y="17" text-anchor="middle" fill="#fff">${L[0]}</text>
+ <path d="M186 13 H210" stroke="#ffd36b" stroke-width="3"/><path d="M206 7 L216 13 L206 19Z" fill="#ffd36b"/>
+ <rect x="220" y="0" width="160" height="26" rx="6" fill="#2f8a3c"/><text x="300" y="12" text-anchor="middle" fill="#fff" font-weight="600">${L[1]}</text><text x="300" y="22" text-anchor="middle" fill="#e8ffe9" font-size="7.5">${L[2]}</text>
+ <ellipse cx="100" cy="125" rx="78" ry="64" fill="#3c7fc4"/><ellipse cx="100" cy="125" rx="64" ry="52" fill="#86c1ea"/>
+ <circle cx="104" cy="118" r="22" fill="#f2c27a"/><circle cx="104" cy="118" r="10" fill="#e6662f"/>
+ <ellipse cx="68" cy="150" rx="12" ry="5" fill="#7cc06a" transform="rotate(-20 68 150)"/><ellipse cx="140" cy="148" rx="11" ry="5" fill="#7cc06a" transform="rotate(25 140 148)"/><ellipse cx="80" cy="95" rx="9" ry="4" fill="#b285d6"/>
+ <g transform="rotate(-18 300 128)"><ellipse cx="300" cy="128" rx="82" ry="46" fill="#9b2420"/><ellipse cx="300" cy="128" rx="74" ry="38" fill="#3e9f3e"/>
+ <path d="M236 128 q10-24 20 0 t20 0 t20 0 t20 0 t20 0 t20 0" fill="none" stroke="#c9f1a7" stroke-width="3"/>
+ ${[248,268,288,308,328,348].map(x=>`<circle cx="${x}" cy="${118+(x%40?14:-12)}" r="3" fill="#ffe36b"/>`).join('')}</g>
+ <g fill="#fff" font-size="8"><text x="318" y="62">ATP ↑</text><text x="346" y="80">NO ↑</text><text x="352" y="104">ROS ↑</text><text x="230" y="194">${L[3]}</text></g></svg>`;
+const cable = `<svg viewBox="0 0 160 110" aria-hidden="true"><g fill="none" stroke="#2a2a2a" stroke-width="1.6"><rect x="14" y="14" width="18" height="12" rx="3"/><path d="M23 26 V34 C23 60 60 40 92 44 C130 50 130 86 96 88 C70 90 70 70 40 76"/><rect x="18" y="72" width="24" height="12" rx="2"/><path d="M8 78 H18"/></g></svg>`;
+const booklet = `<svg viewBox="0 0 120 110" aria-hidden="true"><g fill="#fff" stroke="#2a2a2a" stroke-width="1.6"><path d="M20 24 L64 16 L64 96 L20 104Z"/><path d="M64 16 L100 10 L100 90 L64 96Z"/><path d="M28 30 L64 24"/></g><text x="80" y="52" font-size="8" transform="rotate(-10 80 52)" font-style="italic" fill="#2a2a2a">User Manual</text></svg>`;
+const lying = `<svg viewBox="0 0 220 120" aria-hidden="true"><g fill="none" stroke="#2a2a2a" stroke-width="1.8" stroke-linecap="round"><path d="M8 70 Q60 50 112 66 Q150 72 196 58"/><path d="M14 64 C30 46 54 40 70 46"/><path d="M118 64 C140 40 170 34 200 44"/><path d="M60 86 Q110 70 160 86 L160 102 Q110 92 60 102Z" fill="#fff"/><rect x="92" y="88" width="34" height="8" rx="4"/></g></svg>`;
+const pressing = `<svg viewBox="0 0 220 120" aria-hidden="true"><g fill="none" stroke="#2a2a2a" stroke-width="1.6"><rect x="16" y="34" width="188" height="44" rx="22"/>${[48,84,136,170].map(x=>`<circle cx="${x}" cy="56" r="13"/>`).join('')}<rect x="107" y="44" width="6" height="24" rx="3"/><path d="M168 56 a6 6 0 1 0 6 -6" /><path d="M160 76 C170 92 186 112 206 116 M170 70 C176 84 196 98 214 100" stroke-linecap="round"/><path d="M164 70 q-2 -12 8 -14 q8 2 6 14" fill="#fff"/></g></svg>`;
+const stored = `<svg viewBox="0 0 220 120" aria-hidden="true">${product(3).replace('viewBox="0 0 480 160"','viewBox="-20 -10 520 180"')}</svg>`;
+
+/* ---------- content ---------- */
+const P = [];
+const add = (en, zh, o={}) => P.push(Object.assign({en, zh}, o));
+const pn = n => `<div class="pn">${n}</div>`;
+
+// 0 cover
+add(
+ `<div class="page cover">${LOGO}<div class="fig" style="width:100%">${product()}</div><div><div class="ttl">NeoBack Air<br>User Manual</div><div class="lang">ENGLISH</div><div class="mail">support@flikeze.com</div></div></div>`,
+ `<div class="page cover zh">${LOGO}<div class="fig" style="width:100%">${product()}</div><div><div class="ttl">NeoBack Air<br>用户手册</div><div class="lang">中文</div><div class="mail">support@flikeze.com</div></div></div>`, {cover:true});
+
+// 1 contents
+const TOC_EN=['About Us','Photobiomodulation','Wavelength','Packaging List','How to Use','Mode Introduction','FAQs','Technical Specifications','Precautions','Warnings','Maintenance','Warranty'];
+const TOC_ZH=['关于我们','光生物调节','波长','包装清单','使用方法','模式介绍','常见问题','技术参数','注意事项','警告','保养维护','保修'];
+const TOC_PG=[1,2,3,4,4,9,10,11,12,13,14,15];
+const TOC_GO=[2,3,4,5,5,10,11,12,13,14,15,16];
+const toc = (T)=>`<ol class="toc">${T.map((t,i)=>`<li data-go="${TOC_GO[i]}"><span>${i+1}</span><span class="tl">${t}</span><span class="lead"></span><span class="pg">${TOC_PG[i]}</span></li>`).join('')}</ol>`;
+add(`<div class="page">${head('r')}<h2 class="t">Contents</h2>${toc(TOC_EN)}<p style="margin-top:1.2em">Thank you for purchasing FliKEZE. This manual contains important information about safety, usage, and warranty. Please follow the instructions to use the product and keep this manual for future reference.</p></div>`,
+    `<div class="page zh">${head('r')}<h2 class="t">目录</h2>${toc(TOC_ZH)}<p style="margin-top:1.2em">感谢您购买 FliKEZE。本手册包含有关安全、使用和保修的重要信息。请按照说明使用本产品，并妥善保管本手册以备日后查阅。</p></div>`);
+
+const social = `<div class="social"><span style="background:#d6336c">IG</span><span style="background:#1877f2">f</span><span style="background:#e62117">▶</span><span style="background:#111">♪</span><span style="background:#111">X</span></div>`;
+const qr = (()=>{let s='<svg class="qr" viewBox="0 0 21 21" aria-hidden="true"><rect width="21" height="21" fill="#fff"/>';const f=(x,y)=>`<rect x="${x}" y="${y}" width="7" height="7" fill="#111"/><rect x="${x+1}" y="${y+1}" width="5" height="5" fill="#fff"/><rect x="${x+2}" y="${y+2}" width="3" height="3" fill="#111"/>`;s+=f(0,0)+f(14,0)+f(0,14);let seed=7;for(let y=0;y<21;y++)for(let x=0;x<21;x++){if((x<8&&y<8)||(x>12&&y<8)||(x<8&&y>12))continue;seed=(seed*73+11)%101;if(seed%3===0)s+=`<rect x="${x}" y="${y}" width="1" height="1" fill="#111"/>`;}return s+'</svg>';})();
+
+// 2 About (p1)
+add(`<div class="page">${head('r')}<h2 class="t">About Us</h2>
+<p class="c">Welcome to FLIKEZE! We specialize in high-quality wellness, fitness, and beauty products designed to enhance your lifestyle. Our mission is to make advanced wellness and beauty solutions accessible to everyone.</p>
+<p class="c">By combining cutting-edge technology with exceptional quality, we offer products that support your journey to a healthier, more vibrant life. Each product is crafted with care to ensure the best value for your investment. Designed to meet your unique needs, our products enhance your overall well-being.</p>
+<p class="c">Join the FLIKEZE community and embrace a healthier, happier lifestyle. We're here to support you every step of the way with products that inspire and deliver results. If you have any further questions, feel free to contact us at:<br><b>support@flikeze.com</b></p>
+<p class="c">Your journey to wellness starts here.</p><p class="c">www.flikeze.com</p>${qr}${social}<div class="handle">@FliKEZE</div>${pn(1)}</div>`,
+`<div class="page zh">${head('r')}<h2 class="t">关于我们</h2>
+<p class="c">欢迎来到 FLIKEZE！我们专注于打造高品质的健康、健身与美容产品，旨在提升您的生活品质。我们的使命是让每个人都能享受到先进的健康与美容解决方案。</p>
+<p class="c">我们将前沿科技与卓越品质相结合，为您提供助力更健康、更有活力生活的产品。每一件产品都经过用心打造，确保物超所值。我们的产品专为满足您的独特需求而设计，全面提升您的身心健康。</p>
+<p class="c">加入 FLIKEZE 社区，拥抱更健康、更快乐的生活方式。我们将以激发灵感、切实见效的产品，在每一步为您提供支持。如有任何其他问题，欢迎联系我们：<br><b>support@flikeze.com</b></p>
+<p class="c">您的健康之旅，从这里开始。</p><p class="c">www.flikeze.com</p>${qr}${social}<div class="handle">@FliKEZE</div>${pn(1)}</div>`);
+
+// 3 PBM (p2)
+add(`<div class="page dense">${head('l')}<h2 class="t">Photobiomodulation</h2>
+<p>Photobiomodulation (PBM), originally known as low-level laser therapy (LLLT), was discovered in 1967 by Endre Mester, who noticed improved hair growth and wound healing in rats with a low-power ruby laser, unlike the high-power lasers used for tumor treatments.<br>Over time, it was found that not only lasers but also non-coherent light-emitting diodes (LEDs) could achieve similar therapeutic effects, leading to the adoption of the term (PBM).<br>This field has gained recognition for its potential in enhancing wound healing and cellular growth, and continues to evolve with ongoing research into its mechanisms and optimal application parameters.</p>
+<div class="redcard"><div class="rt">Photobiomodulation</div><div class="rs">After exposure to red light, cells are activated, stimulating mitochondria to produce energy.</div>${pbm(['Irradiate body tissues','Improves tissue function','Anti-inflammatory effects, improves energy metabolism','Cytochrome c oxidase'])}</div>
+<p>This innovative technique harnesses the power of light to instigate a cascade of beneficial changes at the cellular level. Central to its mechanism is the stimulation of mitochondria, the cell's powerhouse, enhancing the production of Adenosine Triphosphate (ATP), the vital energy currency of cellular functions. Beyond boosting energy availability, PBM facilitates improved cell signaling, fosters the synthesis of growth factors, and importantly, mitigates oxidative stress, thereby promoting cellular health and recovery.</p>${pn(2)}</div>`,
+`<div class="page zh dense">${head('l')}<h2 class="t">光生物调节</h2>
+<p>光生物调节（PBM），最初被称为低强度激光疗法（LLLT），由 Endre Mester 于 1967 年发现。他注意到，与用于肿瘤治疗的高功率激光不同，低功率红宝石激光可以促进大鼠的毛发生长和伤口愈合。<br>随着时间推移，人们发现不仅激光，非相干的发光二极管（LED）也能达到类似的治疗效果，因此开始采用"光生物调节（PBM）"这一术语。<br>该领域因其在促进伤口愈合和细胞生长方面的潜力而获得认可，相关机制和最佳应用参数的研究仍在不断发展。</p>
+<div class="redcard"><div class="rt">光生物调节</div><div class="rs">红光照射后，细胞被激活，刺激线粒体产生能量。</div>${pbm(['照射身体组织','改善组织功能','抗炎作用，改善能量代谢','细胞色素 c 氧化酶'])}</div>
+<p>这项创新技术利用光的力量，在细胞层面引发一系列有益的变化。其核心机制是刺激细胞的"能量工厂"——线粒体，促进三磷酸腺苷（ATP）的生成，而 ATP 是细胞功能所需的关键能量来源。除了提升能量供应外，PBM 还能改善细胞信号传导，促进生长因子的合成，更重要的是能够减轻氧化应激，从而促进细胞健康与恢复。</p>${pn(2)}</div>`);
+
+// 4 Wavelength (p3)
+add(`<div class="page">${head('r')}<h2 class="t">Wavelength</h2><div class="fig">${wave(['EPIDERMIS','DERMIS','SUBCUTANEOUS TISSUE','MUSCLE','BONE','INTERIOR TISSUES'])}</div>
+<p class="c"><span class="k">Red light</span><br>The wavelength of red light is between 600-780 nanometers, and it can be absorbed by the skin up to a maximum depth of 4 to 5 millimeters, thereby enhancing the health and healing of the skin layer.</p>
+<p class="c"><span class="k">NIR (Near-infrared)</span><br>The wavelength of NIR is between 780-1100 nanometers, which is invisible to the human eye. It can penetrate deeper into tissues up to 5-10 millimeters, and this absorption depth extends to bones, muscles, blood vessels, organs, abdominal fat, lymph nodes, and other tissues and fluids beneath the skin, thereby enhancing recovery and supporting anti-inflammatory processes.</p>${pn(3)}</div>`,
+`<div class="page zh">${head('r')}<h2 class="t">波长</h2><div class="fig">${wave(['表皮','真皮','皮下组织','肌肉','骨骼','内部组织'])}</div>
+<p class="c"><span class="k">红光</span><br>红光的波长在 600–780 纳米之间，可被皮肤吸收，最大深度为 4 至 5 毫米，从而促进皮肤层的健康与修复。</p>
+<p class="c"><span class="k">近红外光（NIR）</span><br>近红外光的波长在 780–1100 纳米之间，人眼不可见。它可以更深入地穿透组织，深度可达 5–10 毫米，吸收深度可延伸至骨骼、肌肉、血管、器官、腹部脂肪、淋巴结以及皮下其他组织和体液，从而促进恢复并支持抗炎过程。</p>${pn(3)}</div>`);
+
+// 5 Packaging + product intro (p4)
+const pack = (a,b,c,d,e,f) => `<div style="border:1.4px solid #2a2a2a;border-radius:1em;padding:.8em 1em;margin-bottom:1em"><div class="fig" style="margin:0 auto;width:62%">${product(3)}</div><p class="c" style="margin:-.2em 0 .5em">${a}</p><div class="two"><div class="c"><div style="width:70%;margin:0 auto">${cable}</div>${b}</div><div class="c"><div style="width:58%;margin:0 auto">${booklet}</div>${c}</div></div></div>
+<h2 class="t" style="margin-bottom:.4em">${d}</h2><p class="k">${e}</p>
+<div class="two small" style="margin-bottom:.2em"><div class="c">${f[0]}</div><div class="c">${f[1]}</div></div><div class="fig" style="width:86%;margin:0 auto">${product()}</div>`;
+add(`<div class="page dense">${head('l')}<h2 class="t">Packaging List</h2>${pack('FliKEZE NeoBack','TYPE-C Charging Cable','User Manual','How to Use','[Product Introduction]',['Number of LEDs :60 pieces<br>Wavelengths :660nm+850nm','Control Buttons<br>TYPE-C Charging Port'])}${pn(4)}</div>`,
+    `<div class="page zh dense">${head('l')}<h2 class="t">包装清单</h2>${pack('FliKEZE NeoBack','Type-C 充电线','用户手册','使用方法','【产品介绍】',['灯珠数量：60 颗<br>波长：660nm+850nm','控制按键<br>Type-C 充电口'])}${pn(4)}</div>`);
+
+// 6 How to use: panel + traction (p5)
+const g = (color,label,txt,app) => `<div class="gear"><span class="dot" style="color:${color}"></span><span class="g">${label}</span> ${txt}<br><span class="app-s">${app}</span></div>`;
+add(`<div class="page denser">${head('r')}<h2 class="t">How to Use</h2><div class="fig" style="margin-bottom:.4em">${panel(['① Traction Mode','② Heating Mode','③ Vibration Mode','④ Power On/Off +','Phototherapy','⑤ Battery','Indicator Light','⑥ TYPE-C Charging Port'])}</div>
+<p><span class="pill">1</span><b>"Traction Mode Button:</b> Press once to activate the traction function; press again to cycle through the gears (Gear 1 → Gear 2 → Gear 3 → Traction Off).</p>
+${g('#3aa757','"Gear 1:','The button lights up green. (Inflate for 10 seconds → Deflate for 10 seconds, cycle repeatedly)','Application Scenarios: Suitable for first-time users, people with low lumbar tolerance, or for daily mild lumbar relaxation. This mode features a steady inflation and deflation rhythm with gentle traction force, which can softly stretch the lumbar vertebrae and relieve mild soreness caused by prolonged sitting.')}
+${g('#e2b007','"Gear 2:','The button lights up yellow. (Inflate for 6 seconds → Pause for 2 seconds → Inflate for 6 seconds → Pause for 2 seconds → Deflate for 20 seconds, cycle repeatedly)','Application Scenarios: Suitable for people with moderate lumbar soreness and stiffness. This mode adopts a "segmented inflation + short pause" method with a gradual traction force, which can effectively stretch the lumbar intervertebral space and improve the state of lumbar muscle tension.')}
+${g('#c8302c','"Gear 3:','The button lights up red. (Inflate for 4 seconds → Pause for 2 seconds → Inflate for 4 seconds → Pause for 2 seconds → Inflate for 4 seconds → Pause for 2 seconds → Deflate for 20 seconds, cycle repeatedly)','Application Scenarios: Suitable for people with high lumbar tolerance who need deep traction relaxation (e.g., long-term desk workers, people with lumbar muscle strain). This mode features multi-stage powerful inflation with stronger and deeper traction force, which can fully stretch the lumbar vertebrae and relieve persistent lumbar soreness and stiffness.')}${pn(5)}</div>`,
+`<div class="page zh denser">${head('r')}<h2 class="t">使用方法</h2><div class="fig" style="margin-bottom:.4em">${panel(['① 牵引模式','② 加热模式','③ 振动模式','④ 开/关机 +','光疗','⑤ 电量','指示灯','⑥ Type-C 充电口'])}</div>
+<p><span class="pill">1</span><b>牵引模式按键：</b>按一次开启牵引功能；再次按下可循环切换档位（1 档 → 2 档 → 3 档 → 关闭牵引）。</p>
+${g('#3aa757','1 档：','按键亮绿灯。（充气 10 秒 → 放气 10 秒，循环往复）','适用场景：适合首次使用者、腰部耐受度较低的人群，或日常轻度腰部放松。该模式充放气节奏平稳，牵引力温和，可轻柔拉伸腰椎，缓解久坐引起的轻度酸痛。')}
+${g('#e2b007','2 档：','按键亮黄灯。（充气 6 秒 → 暂停 2 秒 → 充气 6 秒 → 暂停 2 秒 → 放气 20 秒，循环往复）','适用场景：适合腰部中度酸痛、僵硬的人群。该模式采用"分段充气 + 短暂停顿"的方式，牵引力逐步增强，可有效拉伸腰椎间隙，改善腰部肌肉紧张状态。')}
+${g('#c8302c','3 档：','按键亮红灯。（充气 4 秒 → 暂停 2 秒 → 充气 4 秒 → 暂停 2 秒 → 充气 4 秒 → 暂停 2 秒 → 放气 20 秒，循环往复）','适用场景：适合腰部耐受度较高、需要深度牵引放松的人群（如长期伏案工作者、腰肌劳损人群）。该模式多段强力充气，牵引力更强、更深，可充分拉伸腰椎，缓解持续性腰部酸痛和僵硬。')}${pn(5)}</div>`);
+
+// 7 heating + vibration (p6)
+add(`<div class="page dense">${head('l')}<h2 class="t">How to use</h2>
+<p><span class="pill">2</span><b>"Heating Mode Button:</b> Press once to activate the heating function; press again to cycle through the temperature levels (40°C → 44°C → 48°C → Heating Off).</p>
+<div class="gear"><span class="dot" style="color:#3aa757"></span>"Temperature 40°C: The button lights up green.</div><div class="gear"><span class="dot" style="color:#e2b007"></span>"Temperature 44°C: The button lights up yellow.</div><div class="gear"><span class="dot" style="color:#c8302c"></span>"Temperature 48°C: The button lights up red.</div>
+<p style="margin-top:.8em"><span class="pill">3</span><b>"Vibration Mode Button:</b> Press once to activate the vibration function; press again to cycle through the gears (Gear 1 → Gear 2 → Gear 3 → Gear 4 → Vibration Off).</p>
+${g('#3aa757','"Gear 1:','The button lights up green. (Continuous vibration at 75% intensity)','Application Scenarios: Gentle relaxation; suitable for first-time users and people with sensitive lumbar areas')}
+${g('#e2b007','"Gear 2:','The button lights up yellow. (Intermittent vibration at 80% intensity: vibrate for 300ms → pause for 300ms, cycle repeatedly)','Application Scenarios: Moderate relief; alleviates mild lumbar soreness and distension')}
+${g('#c8302c','"Gear 3:','The button lights up red. (Intermittent vibration at 85% intensity: vibrate for 1 second → pause for 0.5 seconds, cycle repeatedly)','Application Scenarios: Deep massage; improves lumbar muscle stiffness')}
+${g('#2f6fd6','"Gear 4:','The button lights up blue. (Intermittent vibration at 90% intensity: vibrate for 3 seconds → pause for 1 second, cycle repeatedly)','Application Scenarios: Powerful pressure relief; targets persistent soreness caused by prolonged sitting or muscle strain')}
+<p class="k">Special Note: When the vibration function is running, it will automatically pause if the air cushion enters the inflation state; the vibration function will resume automatically in other states.</p>${pn(6)}</div>`,
+`<div class="page zh dense">${head('l')}<h2 class="t">使用方法</h2>
+<p><span class="pill">2</span><b>加热模式按键：</b>按一次开启加热功能；再次按下可循环切换温度档位（40°C → 44°C → 48°C → 关闭加热）。</p>
+<div class="gear"><span class="dot" style="color:#3aa757"></span>温度 40°C：按键亮绿灯。</div><div class="gear"><span class="dot" style="color:#e2b007"></span>温度 44°C：按键亮黄灯。</div><div class="gear"><span class="dot" style="color:#c8302c"></span>温度 48°C：按键亮红灯。</div>
+<p style="margin-top:.8em"><span class="pill">3</span><b>振动模式按键：</b>按一次开启振动功能；再次按下可循环切换档位（1 档 → 2 档 → 3 档 → 4 档 → 关闭振动）。</p>
+${g('#3aa757','1 档：','按键亮绿灯。（75% 强度持续振动）','适用场景：轻柔放松；适合首次使用者和腰部敏感人群')}
+${g('#e2b007','2 档：','按键亮黄灯。（80% 强度间歇振动：振动 300 毫秒 → 暂停 300 毫秒，循环往复）','适用场景：中度舒缓；缓解轻度腰部酸痛和胀感')}
+${g('#c8302c','3 档：','按键亮红灯。（85% 强度间歇振动：振动 1 秒 → 暂停 0.5 秒，循环往复）','适用场景：深层按摩；改善腰部肌肉僵硬')}
+${g('#2f6fd6','4 档：','按键亮蓝灯。（90% 强度间歇振动：振动 3 秒 → 暂停 1 秒，循环往复）','适用场景：强力减压；针对久坐或肌肉劳损引起的持续性酸痛')}
+<p class="k">特别说明：振动功能运行时，如气囊进入充气状态，振动会自动暂停；其他状态下振动功能会自动恢复。</p>${pn(6)}</div>`);
+
+// 8 power, battery, type-c (p7)
+const batt = `<svg viewBox="0 0 20 60" style="width:1.3em;height:auto;vertical-align:middle;margin-right:.4em" aria-hidden="true">${[8,22,36,50].map((y,i)=>`<circle cx="${10+(i===0||i===3?-2:0)}" cy="${y}" r="4.5" fill="#6b8f2a"/>`).join('')}</svg>`;
+add(`<div class="page">${head('r')}<h2 class="t">How to use</h2>
+<p><span class="pill">4</span><b>"Power On/Off + Phototherapy Button:</b> Press and hold to turn the device on/off; press briefly to activate/deactivate the phototherapy function (660nm+850nm).</p>
+<p style="margin-top:1em"><span class="pill">5</span>${batt}<b>"Battery Indicator Light:</b> After powering on, the battery indicator light stays steadily green.</p>
+<p style="margin-left:1.6em">Battery Display Rules: There are 4 indicator lights in total, each representing 25% of the battery capacity. After powering on, the number of lights illuminated matches the remaining battery level by default.</p>
+<p style="margin-left:1.6em">Low Battery Alert: When the remaining battery is below 10%, all 4 indicator lights flash simultaneously to remind you to charge the device promptly.</p>
+<p style="margin-left:1.6em">Indicator Light Display During Charging:<br>Charging: All 4 indicator lights flash green cyclically;<br>Fully Charged: All 4 indicator lights stay steadily green.</p>
+<p style="margin-top:1em"><span class="pill">6</span><b>"TYPE-C Charging Port.</b></p><ol class="k" style="margin-left:1.6em"><li>The device cannot be turned on or operated while charging.</li><li>If the device has not been used for a long time, please charge it before reuse.</li></ol>${pn(7)}</div>`,
+`<div class="page zh">${head('r')}<h2 class="t">使用方法</h2>
+<p><span class="pill">4</span><b>开/关机 + 光疗按键：</b>长按开机/关机；短按开启/关闭光疗功能（660nm+850nm）。</p>
+<p style="margin-top:1em"><span class="pill">5</span>${batt}<b>电量指示灯：</b>开机后，电量指示灯常亮绿灯。</p>
+<p style="margin-left:1.6em">电量显示规则：共 4 个指示灯，每个代表 25% 的电量。开机后，默认点亮的指示灯数量与剩余电量相对应。</p>
+<p style="margin-left:1.6em">低电量提醒：剩余电量低于 10% 时，4 个指示灯同时闪烁，提醒您及时充电。</p>
+<p style="margin-left:1.6em">充电时指示灯显示：<br>充电中：4 个指示灯循环闪烁绿灯；<br>充满电：4 个指示灯常亮绿灯。</p>
+<p style="margin-top:1em"><span class="pill">6</span><b>Type-C 充电口。</b></p><ol class="k" style="margin-left:1.6em"><li>充电时设备无法开机或操作。</li><li>如设备长时间未使用，请先充电再使用。</li></ol>${pn(7)}</div>`);
+
+// 9 operating instructions (p8)
+add(`<div class="page dense">${head('l')}<h2 class="t">How to use</h2><p class="k">[Operating Instructions]</p>
+<div class="step"><div class="box">${lying}</div><div><b>Step 1</b><br>Lie flat on your back and place the product centered under the lumbar region.</div></div>
+<div class="step"><div class="box">${pressing}</div><div><b>Step 2</b><br>(1) Press and hold the <span class="pill">⏻</span> button to turn the device on/off.<br>(2) Adjust the modes and gears according to personal needs.</div></div>
+<p class="small">Press the traction button once to activate traction mode → switch gears → deactivate traction mode. Press the heating button once to activate heating mode → switch temperature levels → deactivate heating mode. Press the vibration button once to activate vibration mode → switch gears → deactivate vibration mode. Press the power button once to turn the phototherapy mode on/off.</p>
+<p class="k small">Memory Function: The device will default to the last used mode when turned on next time.<br>Auto Shutdown: The device will automatically turn off 30 minutes after startup. To continue using it, press and hold the power button again.</p>
+<div class="step"><div class="box">${stored}</div><div><b>Step 3</b><br>After use, store the product properly. Do not fold the product or place heavy objects on top of it.</div></div>${pn(8)}</div>`,
+`<div class="page zh dense">${head('l')}<h2 class="t">使用方法</h2><p class="k">【操作说明】</p>
+<div class="step"><div class="box">${lying}</div><div><b>步骤 1</b><br>平躺，将产品放在腰部正下方居中位置。</div></div>
+<div class="step"><div class="box">${pressing}</div><div><b>步骤 2</b><br>（1）长按 <span class="pill">⏻</span> 键开机/关机。<br>（2）根据个人需要调节模式和档位。</div></div>
+<p class="small">按一次牵引键开启牵引模式 → 切换档位 → 关闭牵引模式。按一次加热键开启加热模式 → 切换温度档位 → 关闭加热模式。按一次振动键开启振动模式 → 切换档位 → 关闭振动模式。按一次电源键开启/关闭光疗模式。</p>
+<p class="k small">记忆功能：下次开机时，设备默认使用上次的模式。<br>自动关机：设备开机 30 分钟后自动关机。如需继续使用，请再次长按电源键。</p>
+<div class="step"><div class="box">${stored}</div><div><b>步骤 3</b><br>使用后请妥善存放产品。请勿折叠产品，也不要在上面放置重物。</div></div>${pn(8)}</div>`);
+
+// 10 usage freq + modes (p9)
+add(`<div class="page denser">${head('r')}<h2 class="t" style="margin-bottom:.5em">How to use</h2><p class="k">[Usage Frequency]</p>
+<ol><li>It is recommended to use 1-2 times per day.</li><li>The recommended single use duration is between 10-20 minutes. After gradual adaptation, it can be extended to 30 minutes. Prolonged continuous use exceeding 30 minutes is not recommended.</li></ol>
+<h2 class="t" style="margin:.6em 0 .5em">Mode Introduction</h2>
+<p>NeoBack Air offers four physiotherapy modes designed to meet your different lumbar care needs and comprehensively protect lumbar spine health.</p>
+<p><b>1. Traction Mode | Traction Mode</b><br>Function Description: Through the precise inflation and deflation of the built-in intelligent air cushion, it generates gentle and continuous upward pulling force to perform dynamic traction on the lumbar spine.<br>Core Benefits: Effectively stretches the lumbar spine, helps restore its natural physiological curvature, relieves intervertebral disc pressure, relaxes tight lumbar muscles caused by prolonged sitting or strain, and improves lumbar comfort.</p>
+<p><b>2. Heating Mode | Heating Mode</b><br>Function Description: Adopts constant temperature heating technology to provide deep and uniform thermal energy, and the temperature can be adjusted according to personal preference.<br>Core Benefits: Hot compress helps accelerate lumbar blood circulation, promote metabolism, effectively relieve lumbar coldness, stiffness and muscle soreness, and bring long-lasting warmth and relaxation.</p>
+<p><b>3. Vibration Mode | Vibration Mode</b><br>Function Description: NeoBack Air adopts high-frequency vibration massage technology, which acts precisely on the lumbar muscle groups, and different vibration intensities and frequencies can be switched according to personal preference.<br>Core Benefits: Vibration can penetrate the superficial muscles and reach the deep fascia, effectively stimulate lumbar muscle tissue, promote deep relaxation, and relieve lumbar muscle fatigue.</p>
+<p><b>4. Phototherapy Mode | Phototherapy Mode</b><br>Function Description: Red light and infrared light therapy with specific wavelengths (660nm+850nm) irradiates the lumbar region.<br>Core Benefits: LED light penetrates deep into the subcutaneous tissue to produce gentle biological effects. This helps reduce lumbar inflammatory response and supports the self-repair of lumbar tissues.</p>${pn(9)}</div>`,
+`<div class="page zh denser">${head('r')}<h2 class="t" style="margin-bottom:.5em">使用方法</h2><p class="k">【使用频率】</p>
+<ol><li>建议每天使用 1–2 次。</li><li>建议单次使用 10–20 分钟，逐步适应后可延长至 30 分钟。不建议连续使用超过 30 分钟。</li></ol>
+<h2 class="t" style="margin:.6em 0 .5em">模式介绍</h2>
+<p>NeoBack Air 提供四种理疗模式，满足您不同的腰部护理需求，全面守护腰椎健康。</p>
+<p><b>1. 牵引模式</b><br>功能说明：通过内置智能气囊的精准充放气，产生温和持续的向上拉力，对腰椎进行动态牵引。<br>核心功效：有效拉伸腰椎，帮助恢复其自然生理曲度，缓解椎间盘压力，放松因久坐或劳损而紧绷的腰部肌肉，提升腰部舒适度。</p>
+<p><b>2. 加热模式</b><br>功能说明：采用恒温加热技术，提供深层、均匀的热能，温度可根据个人喜好调节。<br>核心功效：热敷有助于加速腰部血液循环、促进新陈代谢，有效缓解腰部寒凉、僵硬和肌肉酸痛，带来持久的温暖与放松。</p>
+<p><b>3. 振动模式</b><br>功能说明：NeoBack Air 采用高频振动按摩技术，精准作用于腰部肌群，可根据个人喜好切换不同的振动强度和频率。<br>核心功效：振动可穿透浅层肌肉直达深层筋膜，有效刺激腰部肌肉组织，促进深度放松，缓解腰部肌肉疲劳。</p>
+<p><b>4. 光疗模式</b><br>功能说明：特定波长（660nm+850nm）的红光与红外光照射腰部。<br>核心功效：LED 光深入皮下组织，产生温和的生物效应，有助于减轻腰部炎症反应，支持腰部组织的自我修复。</p>${pn(9)}</div>`);
+
+// 11 FAQ (p10)
+const FAQ_EN=[['Device Fails to Start','1. Operational Error: Press and hold the power button to turn on the device.<br>2. Dead Battery: Charge the device before turning it on again.<br>3. The device cannot be used while charging.'],['Device Shuts Down Automatically','1. Dead Battery: Charge the device before turning it on again.<br>2. Auto Shutdown: The device will automatically turn off 30 minutes after startup.<br>3. Standby Mode: The device will automatically shut down if no operation is performed within 5 minutes of startup.'],['Unable to Charge','The charger or charging cable is incompatible. Please try replacing the charger.'],['Feeling Heat in Lumbar Area Without Turning on Heating Mode','When the phototherapy mode is activated, the LED beads generate slight heat during operation. This is a normal phenomenon.'],['Weak Vibration Sensation','1. Low Battery: Fully charge the device before turning it on again.<br>2. The product is not placed on a flat surface.'],['Unobvious Hot Compress Effect','1. Insufficient Preheating Time: The heating mode takes about 1-3 minutes to reach the set temperature.<br>2. Low Gear: Please try increasing the temperature gear.'],['Phototherapy Fails to Activate','1. Operational Error: Press the power button briefly to activate phototherapy.<br>2. If other functions work normally but the lights do not turn on, there may be a light source malfunction. Please contact after-sales service.'],['Discomfort During Use','1. Excessively High Gear: Lower the gear of the current mode.<br>2. Overlong Usage Time: Do not use the device for more than 30 minutes at a time.']];
+const FAQ_ZH=[['设备无法启动','1. 操作错误：长按电源键开机。<br>2. 电量耗尽：请先充电再开机。<br>3. 充电时无法使用设备。'],['设备自动关机','1. 电量耗尽：请先充电再开机。<br>2. 自动关机：设备开机 30 分钟后会自动关机。<br>3. 待机模式：开机后 5 分钟内无任何操作，设备将自动关机。'],['无法充电','充电器或充电线不兼容，请尝试更换充电器。'],['未开启加热模式，腰部却有热感','开启光疗模式时，LED 灯珠工作会产生轻微热量，属于正常现象。'],['振动感较弱','1. 电量低：请充满电后再开机。<br>2. 产品未放置在平整的表面上。'],['热敷效果不明显','1. 预热时间不足：加热模式约需 1–3 分钟达到设定温度。<br>2. 档位较低：请尝试调高温度档位。'],['光疗无法开启','1. 操作错误：短按电源键开启光疗。<br>2. 如其他功能正常但灯不亮，可能是光源故障，请联系售后服务。'],['使用时感到不适','1. 档位过高：请调低当前模式的档位。<br>2. 使用时间过长：单次使用请勿超过 30 分钟。']];
+const faq=(rows,h)=>`<table class="tb denser"><tr><th style="width:32%">${h[0]}</th><th>${h[1]}</th></tr>${rows.map(r=>`<tr><td class="c">${r[0]}</td><td>${r[1]}</td></tr>`).join('')}</table>`;
+add(`<div class="page denser">${head('l')}<h2 class="t">FAQ</h2>${faq(FAQ_EN,['Issue','Solution'])}<p class="note">Note: If the above methods cannot solve your problem, do not disassemble the device yourself. Please contact the after-sales service via email at support@flikeze.com for assistance.</p>${pn(10)}</div>`,
+    `<div class="page zh denser">${head('l')}<h2 class="t">常见问题</h2>${faq(FAQ_ZH,['问题','解决方法'])}<p class="note">注：如以上方法无法解决您的问题，请勿自行拆卸设备。请发送邮件至 support@flikeze.com 联系售后服务。</p>${pn(10)}</div>`);
+
+// 12 specs (p11)
+const SPEC_EN=[['Product Name :','NeoBack'],['Product Model :','NeoBack Air'],['Product Model :','500mm x 200mm x 80mm'],['Weight :','740g'],['Wavelengths :','660nm (Red)<br>850nm (NIR)'],['LED :','2-core'],['Number of LEDs :','60 pieces'],['Battery capacity :','5000mAh'],['Charging cable :','TYPE-C'],['Charging time :','≈5.5 hours'],['Usage time :','2.5~14 hours'],['Certification :','FCC, CE, ROHS'],['Warranty :','1 Years']];
+const SPEC_ZH=[['产品名称：','NeoBack'],['产品型号：','NeoBack Air'],['产品尺寸：','500mm × 200mm × 80mm'],['重量：','740g'],['波长：','660nm（红光）<br>850nm（近红外光）'],['LED：','双芯'],['灯珠数量：','60 颗'],['电池容量：','5000mAh'],['充电线：','Type-C'],['充电时间：','约 5.5 小时'],['使用时间：','2.5~14 小时'],['认证：','FCC、CE、ROHS'],['保修：','1 年']];
+const spec=r=>`<table class="tb spec">${r.map(x=>`<tr><td>${x[0]}</td><td>${x[1]}</td></tr>`).join('')}</table>`;
+add(`<div class="page">${head('r')}<h2 class="t">Technical Specifications</h2>${spec(SPEC_EN)}<p class="note">Notice: Battery life varies depending on usage patterns.</p>${pn(11)}</div>`,
+    `<div class="page zh">${head('r')}<h2 class="t">技术参数</h2>${spec(SPEC_ZH)}<p class="note">注意：电池续航时间因使用方式而异。</p>${pn(11)}</div>`);
+
+// 13 precautions (p12)
+add(`<div class="page">${head('l')}<h2 class="t">Precautions</h2><p>To ensure the optimal user experience and device performance, please follow the below usage guidelines:</p>
+<ol><li>Intensity Adjustment: During use, adjust to the most comfortable gear according to personal comfort level to avoid excessive intensity or discomfort.</li><li>Usage Duration: Do not use the device for an excessively long time each time. It is generally recommended to limit single use to 10-20 minutes to prevent muscle fatigue caused by prolonged continuous use.</li><li>Charging Specifications: This device can only be charged with a 5V power adapter. Do not use a power supply with a voltage higher than 5V to charge the device, as this may damage the device.</li><li>Usage Environment: Use the device on a flat and stable surface (such as a yoga mat, a supportive sofa, or a mattress) to ensure the traction effect.</li><li>No Covering: When the heating mode is activated, do not cover the device with heavy clothing or bedding for a long time, as poor heat dissipation may cause potential safety hazards.</li></ol>${pn(12)}</div>`,
+`<div class="page zh">${head('l')}<h2 class="t">注意事项</h2><p>为确保最佳的使用体验和设备性能，请遵循以下使用指南：</p>
+<ol><li>强度调节：使用时请根据个人舒适度调至最舒适的档位，避免强度过大或产生不适。</li><li>使用时长：每次使用时间不宜过长。一般建议单次使用 10–20 分钟，以免长时间连续使用导致肌肉疲劳。</li><li>充电规格：本设备只能使用 5V 电源适配器充电。请勿使用电压高于 5V 的电源为设备充电，否则可能损坏设备。</li><li>使用环境：请在平整、稳定的表面上使用设备（如瑜伽垫、有支撑力的沙发或床垫），以确保牵引效果。</li><li>请勿覆盖：开启加热模式时，请勿长时间用厚衣物或被褥覆盖设备，散热不良可能带来安全隐患。</li></ol>${pn(12)}</div>`);
+
+// 14 warning (p13)
+add(`<div class="page denser">${head('r')}<h2 class="t">Warning</h2><p>⚠ For your health and safety, please carefully read and understand the following warning information before using this product. Improper use may cause personal injury or device damage.</p>
+<p>1. Medical Device Compatibility: Do not use this product simultaneously with other medical electronic instruments such as cardiac pacemakers or electrocardiographs to avoid interference or potential hazards.</p>
+<p>2. Contraindicated Groups:<br>(1) Patients with severe spinal diseases: Prohibited for use by those who have recently undergone lumbar spine surgery, or suffer from severe lumbar fractures, osteoporosis, or spinal tumors.<br>(2) Special Groups: Prohibited for use by pregnant women, and patients with heart disease, malignant tumors, severe cerebrovascular diseases, gastrointestinal bleeding, liver cirrhosis, splenic lesions, etc.<br>(3) Acute Injuries or Inflammation: Not suitable for use if there are open wounds, acute sprains, skin damage or inflammation in the lumbar area.<br>(4) Drug Effects: Patients taking or injecting drugs for a long time must consult a doctor before use.<br>(5) Sensory Disorders: Patients with cutaneous sensory disorders or heat-insensitive individuals are prohibited from using the heating function to avoid scalds.<br>(6) Postpartum Use: Pregnant women can use this product at least 6 weeks after childbirth, and must consult a doctor before use.</p>
+<p>3. High Temperature and Humidity: Do not use this product in an environment with excessively high temperature or humidity.</p>
+<p class="k" style="margin-bottom:.2em">Important Notes</p><p>The above safety precautions do not cover all possible scenarios. If you are unsure whether your condition is suitable for using this product, please consult a professional doctor or contact the FliKEZE customer service team before making a decision.</p>${pn(13)}</div>`,
+`<div class="page zh denser">${head('r')}<h2 class="t">警告</h2><p>⚠ 为了您的健康和安全，使用本产品前请仔细阅读并理解以下警告信息。使用不当可能导致人身伤害或设备损坏。</p>
+<p>1. 医疗设备兼容性：请勿与心脏起搏器、心电图机等其他医用电子仪器同时使用，以免产生干扰或潜在危险。</p>
+<p>2. 禁用人群：<br>（1）严重脊柱疾病患者：近期接受过腰椎手术，或患有严重腰椎骨折、骨质疏松、脊柱肿瘤者禁止使用。<br>（2）特殊人群：孕妇，以及心脏病、恶性肿瘤、严重脑血管疾病、消化道出血、肝硬化、脾脏病变等患者禁止使用。<br>（3）急性损伤或炎症：腰部有开放性伤口、急性扭伤、皮肤破损或炎症时不宜使用。<br>（4）药物影响：长期服用或注射药物的患者，使用前须咨询医生。<br>（5）感觉障碍：皮肤感觉障碍患者或对热不敏感者禁止使用加热功能，以免烫伤。<br>（6）产后使用：产妇须在分娩至少 6 周后方可使用本产品，且使用前须咨询医生。</p>
+<p>3. 高温高湿：请勿在温度或湿度过高的环境中使用本产品。</p>
+<p class="k" style="margin-bottom:.2em">重要提示</p><p>以上安全注意事项无法涵盖所有可能的情况。如您不确定自身状况是否适合使用本产品，请在做出决定前咨询专业医生或联系 FliKEZE 客服团队。</p>${pn(13)}</div>`);
+
+// 15 maintenance (p14)
+add(`<div class="page dense">${head('l')}<h2 class="t">Maintenance</h2><p>Proper maintenance and care can effectively extend the service life of the product. Please read carefully:</p>
+<p>1. Cleaning: If you need to clean the exterior, make sure the power is disconnected first. Gently wipe the product surface with a clean cloth and then place it in a cool place to air dry. Do not use strong corrosive solvents for cleaning.</p>
+<p>2. Waterproof and Moisture-proof: This device is not waterproof. Please avoid splashing water on the main unit or using it in the shower. Do not use it in humid environments such as bathrooms to prevent damage to internal components.</p>
+<p>3. Storage: Store the device in a cool and dry place, away from direct sunlight or high-temperature environments, to prevent aging of the air cushion material and degradation of battery performance.</p>
+<p>4. Long-term Storage:<br>(1) If the product is not used for a short period (about 3 months), wipe the device clean, fully charge it before storing it in a dry place.<br>(2) If the product is not intended for long-term use, be sure to fully charge the device every 3 months to prevent product failure to start or battery damage caused by battery over-discharging.</p>${pn(14)}</div>`,
+`<div class="page zh dense">${head('l')}<h2 class="t">保养维护</h2><p>正确的保养和维护可以有效延长产品的使用寿命。请仔细阅读：</p>
+<p>1. 清洁：如需清洁外部，请先确保已断开电源。用干净的布轻轻擦拭产品表面，然后放在阴凉处自然晾干。请勿使用强腐蚀性溶剂清洁。</p>
+<p>2. 防水防潮：本设备不防水。请避免水溅到主机上，也不要在淋浴时使用。请勿在浴室等潮湿环境中使用，以免损坏内部元件。</p>
+<p>3. 存放：请将设备存放在阴凉干燥处，避免阳光直射或高温环境，以防气囊材料老化和电池性能下降。</p>
+<p>4. 长期存放：<br>（1）如短期内（约 3 个月）不使用，请将设备擦拭干净、充满电后存放在干燥处。<br>（2）如长期不使用，请务必每 3 个月为设备充满一次电，以防电池过度放电导致产品无法启动或电池损坏。</p>${pn(14)}</div>`);
+
+// 16 warranty (p15)
+add(`<div class="page dense">${head('r')}<h2 class="t">Warranty</h2>
+<p>FliKEZE warrants that the NeoBack will operate and perform in accordance with technical specifications for one year from the date of shipment.</p><p>This one-year warranty covers all components and repair labor costs during the warranty period, except for certain circumstances.</p><p>To avail of the warranty service, the buyer shall bear the shipping cost of returning the product to FliKEZE within one year.</p><p>The following situations are not covered under the warranty: the device has been abused, misused, modified, damaged, or fitted with replacement parts not manufactured by FliKEZE.</p><p>FliKEZE shall not be liable for any indirect losses or inconveniences caused by product malfunctions.</p><p>After the warranty period expires, all component and repair labor costs shall be borne by the buyer.</p><p>Whether for repair or replacement during or after the warranty period, FliKEZE reserves the right to provide customers with components or replacement products that differ in color from the original device.</p>
+<p style="margin-top:1em">For assistance, please send an email to <b>support@flikeze.com</b>.</p>${pn(15)}</div>`,
+`<div class="page zh dense">${head('r')}<h2 class="t">保修</h2>
+<p>FliKEZE 保证 NeoBack 自发货之日起一年内按照技术规格正常运行和工作。</p><p>本一年保修涵盖保修期内的所有零部件及维修人工费用，特定情况除外。</p><p>如需享受保修服务，买家须在一年内承担将产品寄回 FliKEZE 的运费。</p><p>以下情况不在保修范围内：设备遭到滥用、误用、改装、损坏，或安装了非 FliKEZE 生产的替换零件。</p><p>FliKEZE 不对产品故障造成的任何间接损失或不便承担责任。</p><p>保修期满后，所有零部件及维修人工费用由买家承担。</p><p>无论是保修期内还是保修期满后的维修或更换，FliKEZE 均保留向客户提供与原设备颜色不同的零部件或替换产品的权利。</p>
+<p style="margin-top:1em">如需帮助，请发送邮件至 <b>support@flikeze.com</b>。</p>${pn(15)}</div>`);
+
+// 17 back cover
+add(`<div class="page back-cover">${LOGO.replace('class="logo"','class="logo" style="font-size:2.2em"')}<p>www.flikeze.com</p>${social}<div class="handle" style="font-size:1.4em">@FliKEZE</div><p class="small">support@flikeze.com</p></div>`,
+    `<div class="page back-cover zh">${LOGO.replace('class="logo"','class="logo" style="font-size:2.2em"')}<p>www.flikeze.com</p>${social}<div class="handle" style="font-size:1.4em">@FliKEZE</div><p class="small">support@flikeze.com</p></div>`);
+
+/* ---------- book engine ---------- */
+const N = P.length;
+const book = document.getElementById('book'), stage = document.getElementById('stage');
+let lang = 'en', spreadMode = true, s = 0, idx = 0, busy = false;
+try { const v = localStorage.getItem('nb-lang'); if (v === 'zh' || v === 'en') lang = v; } catch(e) {}
+const face = i => (i < 0 || i >= N) ? '<div class="page blank"></div>' : P[i][lang];
+const lastS = () => Math.ceil(N / 2);
+
+function size(){
+  const W = stage.clientWidth, H = stage.clientHeight;
+  spreadMode = window.innerWidth >= 760;
+  let pw = spreadMode ? Math.min((W - 8) / 2, H * 0.707) : Math.min(W, H * 0.707);
+  pw = Math.max(240, Math.floor(pw)); const ph = Math.floor(pw / 0.707);
+  document.documentElement.style.setProperty('--pw', pw + 'px');
+  document.documentElement.style.setProperty('--ph', ph + 'px');
+}
+function render(){
+  book.className = 'book ' + (spreadMode ? 'spread' : 'single');
+  if (spreadMode){
+    const L = 2*s - 1, R = 2*s;
+    book.innerHTML = `<div class="slot left">${L>=0?face(L):''}</div><div class="slot right">${R<N?face(R):''}</div>`;
+    if (L < 0) book.firstChild.style.visibility = 'hidden';
+    if (R >= N) book.lastChild.style.visibility = 'hidden';
+  } else {
+    book.innerHTML = `<div class="slot">${face(idx)}</div>`;
+  }
+  fit(); wire(); status();
+}
+function fit(root){
+  (root||book).querySelectorAll('.page').forEach(el=>{
+    el.style.fontSize=''; const base=parseFloat(getComputedStyle(el).fontSize); let f=base, n=0;
+    while(el.scrollHeight>el.clientHeight+1 && n<40){ f*=0.97; el.style.fontSize=f+'px'; n++; }
+  });
+}
+function wire(){
+  book.querySelectorAll('[data-go]').forEach(el => el.addEventListener('click', e => { e.stopPropagation(); go(+el.dataset.go); }));
+}
+function status(){
+  const cur = spreadMode ? Math.max(0, 2*s-1) : idx;
+  const lbl = spreadMode ? (s===0 ? '1' : (2*s<N ? `${2*s}–${2*s+1}` : `${2*s}`)) : `${idx+1}`;
+  document.getElementById('count').textContent = `${lbl} / ${N}`;
+  document.getElementById('prev').disabled = spreadMode ? s===0 : idx===0;
+  document.getElementById('next').disabled = spreadMode ? s>=lastS() || 2*s>=N-1 : idx>=N-1;
+  document.getElementById('b-en').setAttribute('aria-pressed', lang==='en');
+  document.getElementById('b-zh').setAttribute('aria-pressed', lang==='zh');
+  document.getElementById('sub').textContent = lang==='en' ? 'User Manual · electronic edition' : '用户手册 · 电子版';
+  document.getElementById('hint').textContent = lang==='en' ? 'Click the page edges, use ← → keys, or swipe to turn pages' : '点击页面两侧、按 ← → 键或左右滑动即可翻页';
+  document.documentElement.lang = lang==='en' ? 'en' : 'zh-CN';
+}
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+function flip(dir){
+  if (busy) return;
+  if (spreadMode){
+    if (dir>0 && (2*s>=N-1)) return; if (dir<0 && s===0) return;
+    if (reduce){ s += dir; render(); return; }
+    busy = true;
+    const leaf = document.createElement('div'); leaf.className = 'leaf';
+    const left = book.querySelector('.left'), right = book.querySelector('.right');
+    if (dir>0){
+      leaf.style.left = '50%'; leaf.style.transformOrigin = 'left center';
+      leaf.innerHTML = `<div class="face front">${face(2*s)}</div><div class="face back">${face(2*s+1)}</div>`;
+      right.innerHTML = 2*s+2<N ? face(2*s+2) : ''; right.style.visibility = 2*s+2<N ? 'visible' : 'hidden';
+    } else {
+      leaf.style.left = '0'; leaf.style.transformOrigin = 'right center';
+      leaf.innerHTML = `<div class="face front">${face(2*s-1)}</div><div class="face back">${face(2*s-2)}</div>`;
+      left.innerHTML = 2*s-3>=0 ? face(2*s-3) : ''; left.style.visibility = 2*s-3>=0 ? 'visible' : 'hidden';
+    }
+    book.appendChild(leaf); fit();
+    requestAnimationFrame(()=>requestAnimationFrame(()=>{ leaf.style.transform = `rotateY(${dir>0?-180:180}deg)`; }));
+    const done = () => { s += dir; busy = false; render(); };
+    leaf.addEventListener('transitionend', e => { if (e.propertyName==='transform') done(); }, {once:false});
+    setTimeout(()=>{ if (busy) done(); }, 1000);
+  } else {
+    if (dir>0 && idx>=N-1) return; if (dir<0 && idx===0) return;
+    if (reduce){ idx += dir; render(); return; }
+    busy = true;
+    const slot = book.querySelector('.slot');
+    const leaf = document.createElement('div'); leaf.className = 'leaf'; leaf.style.left = '0';
+    if (dir>0){ leaf.style.transformOrigin='left center'; leaf.innerHTML=`<div class="face front">${face(idx)}</div>`; slot.innerHTML = face(idx+1); }
+    else { leaf.style.transformOrigin='left center'; leaf.style.transform='rotateY(-100deg)'; leaf.style.opacity='0'; leaf.innerHTML=`<div class="face front">${face(idx-1)}</div>`; }
+    book.appendChild(leaf); fit();
+    requestAnimationFrame(()=>requestAnimationFrame(()=>{ if(dir>0){leaf.style.transform='rotateY(-100deg)'; leaf.style.opacity='0';} else {leaf.style.transform='rotateY(0deg)'; leaf.style.opacity='1';} }));
+    const done = () => { idx += dir; busy = false; render(); };
+    setTimeout(done, 720);
+  }
+}
+function go(i){
+  i = Math.max(0, Math.min(N-1, i));
+  if (spreadMode) s = Math.floor((i+1)/2); else idx = i;
+  render();
+}
+document.getElementById('next').onclick = () => flip(1);
+document.getElementById('prev').onclick = () => flip(-1);
+book.addEventListener('click', e => {
+  const r = book.getBoundingClientRect(); const x = e.clientX - r.left;
+  if (spreadMode){ if (x > r.width*0.75) flip(1); else if (x < r.width*0.25) flip(-1); }
+  else { if (x > r.width*0.6) flip(1); else if (x < r.width*0.4) flip(-1); }
+});
+addEventListener('keydown', e => { if (e.key==='ArrowRight') flip(1); if (e.key==='ArrowLeft') flip(-1); });
+let tx=null; stage.addEventListener('touchstart', e=>{tx=e.touches[0].clientX},{passive:true});
+stage.addEventListener('touchend', e=>{ if(tx===null) return; const d=e.changedTouches[0].clientX-tx; if(Math.abs(d)>40) flip(d<0?1:-1); tx=null; });
+const setLang = l => { lang = l; try{localStorage.setItem('nb-lang', l)}catch(e){} render(); };
+document.getElementById('b-en').onclick = () => setLang('en');
+document.getElementById('b-zh').onclick = () => setLang('zh');
+let wasSpread = null;
+addEventListener('resize', () => { const cur = spreadMode ? Math.max(0,2*s-1) : idx; size(); if (wasSpread !== spreadMode){ if (spreadMode) s = Math.floor((cur+1)/2); else idx = cur; } wasSpread = spreadMode; render(); });
+size(); wasSpread = spreadMode; render();
+})();
+</script>
+</body>
+</html>
